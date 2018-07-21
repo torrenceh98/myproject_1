@@ -1,0 +1,142 @@
+// Initialize Firebase
+var config = {
+    apiKey: "AIzaSyAVAgMQ160Gjz9cwBkiiXtlXHvEQwX-n8U",
+    authDomain: "groupproject1-bf127.firebaseapp.com",
+    databaseURL: "https://groupproject1-bf127.firebaseio.com",
+    projectId: "groupproject1-bf127",
+    storageBucket: "",
+      };
+  firebase.initializeApp(config);
+ 
+  var dataRef = firebase.database();
+
+
+$("#lyricBtn").hide()
+$("#list").hide()
+
+function openNav() {
+    document.getElementById("myNav").style.width = "100%";
+ }
+ 
+ function closeNav() {
+    document.getElementById("myNav").style.width = "0%";
+ }
+ function openSearch() {
+     document.getElementById("myOverlay").style.display = "block";
+ }
+ 
+ function closeSearch() {
+     document.getElementById("myOverlay").style.display = "none";
+ }
+
+ $("#submitBtn").on("click", function(event){
+    event.preventDefault();
+    
+    var artistSearch = $("#inputSearch").val();
+
+   //Creates variable for holding data
+   var newArtistSearch = {
+    artist: artistSearch
+};
+
+//Uploads artist search to the database
+dataRef.ref().push(newArtistSearch);
+    
+    console.log(artistSearch);
+
+
+var queryURL = "https://api.audd.io/?method=findLyrics&q=" + artistSearch 
+
+$.ajax({
+  url: queryURL,
+  method: "GET"
+}).then(function(response) {
+
+    
+console.log(response.result[0].lyrics);
+    
+
+for (var i = 0; i < response.result.length; i++) {
+
+var ourLyrics = response.result[i].lyrics;
+var ourSongs = response.result[i].full_title;
+
+
+
+
+var lyricBtn = $('<button id="lyricBtn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong'+ [i] + '" > Lyrics </button>')
+
+var modalBtn = $('<div class="modal fade" id="exampleModalLong'+ [i] + '" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="exampleModalLongTitle">LYRICS</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div id="insideBtn' + [i] + '" class="modal-body">' + ourLyrics + '</div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> ')
+
+$("#songs").append('<br/>' + ourSongs + "<br/>")
+$("#songs").append(modalBtn)
+$("#songs").append(lyricBtn)
+
+
+  }  
+});
+
+
+$("#lyricBtn").show()
+
+//adding query search with artist and api key
+var youtubeURL = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=" + artistSearch + "&type=video&key=AIzaSyA1cXXxMTZqpq24jIa7rz0UQW5DbhSQ1bs"
+
+$.ajax({
+   url: youtubeURL,
+   method: "GET"
+  }).then(function(response) {
+      //console.log(response);
+  
+      //this is where we get the video id from the object//
+  var videoID = response.items[1].id.videoId;
+      //creating the results
+      
+    //   console.log(artistResult);
+      //creating link to youtube//
+      console.log(videoID);
+      
+      var createYoutubeLink = $('<a target="_blank" href="https://www.youtube.com/watch?v=' + videoID + '"> Top Video </a>');
+      //appending div to the page//
+
+      $("#songs").append(createYoutubeLink);
+      
+  //console.log(videoID);
+
+  //checking to see if video is available//
+  var videoStatus = 'https://www.googleapis.com/youtube/v3/videos?id=VIDEOID&part=status&key=AIzaSyA1cXXxMTZqpq24jIa7rz0UQW5DbhSQ1bs'
+  //console.log(videoStatus);
+
+/* for each (videoStatus){
+      $.ajax({
+          url: youtubeURL,
+          method: "GET"
+      }).then(function(status) {
+          console.log(status);
+          
+      });
+  } */ 
+  
+//   var vidsrc = $('<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoID + '" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>');
+//       console.log(vidsrc);
+//       console.log(response)
+  
+//       $("#submitBtn").append(vidsrc);
+      
+      
+  });
+
+  
+
+
+ 
+
+});
+
+
+
+
+
+
+ 
+
